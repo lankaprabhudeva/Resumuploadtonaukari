@@ -7,8 +7,9 @@ pipeline {
     }
 
     triggers {
-    cron('H/10 6-18 * * 1-5')
-}
+        // Run every 10 mins between 6 AM and 6 PM (Mon–Fri)
+        cron('H/10 6-18 * * 1-5')
+    }
 
     stages {
         stage('Checkout Code') {
@@ -25,17 +26,20 @@ pipeline {
 
         stage('Run Resume Upload Test') {
             steps {
-                // Pass resume path dynamically
+                // Pass resume path dynamically from Jenkins workspace
                 bat 'mvn test -Dresume.path=%WORKSPACE%\\src\\test\\resources\\Resume\\Prabhudeva_Resume.pdf'
             }
         }
 
         stage('Archive Reports & Screenshots') {
             steps {
-                // Archive TestNG report
+                // Collect TestNG XML report
                 junit '**/test-output/testng-results.xml'
 
-                // Archive screenshots if any failure occurs
+                // Collect JUnit-style reports from Surefire
+                junit '**/target/surefire-reports/*.xml'
+
+                // Archive screenshots (if taken during failures)
                 archiveArtifacts artifacts: '**/*.png', allowEmptyArchive: true
             }
         }

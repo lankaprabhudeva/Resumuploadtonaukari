@@ -57,31 +57,32 @@
     </dependencies>
 
     <build>
-        <plugins>
-            <!-- Compiler plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                </configuration>
-            </plugin>
+    <plugins>
+        <!-- Surefire plugin for running TestNG tests -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>3.2.5</version>
+            <configuration>
+                <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+                <suiteXmlFiles>
+                    <suiteXmlFile>testng.xml</suiteXmlFile>
+                </suiteXmlFiles>
+                <properties>
+                    <!-- Disable default listeners -->
+                    <property>
+                        <name>usedefaultlisteners</name>
+                        <value>false</value>
+                    </property>
+                    <!-- Generate TestNG XML reports for Jenkins -->
+                    <property>
+                        <name>listener</name>
+                        <value>org.testng.reporters.XMLReporter</value>
+                    </property>
+                </properties>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
 
-            <!-- Surefire plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>${surefire.version}</version>
-                <configuration>
-                    <suiteXmlFiles>
-                        <suiteXmlFile>testng.xml</suiteXmlFile>
-                    </suiteXmlFiles>
-                    <reportsDirectory>target/surefire-reports</reportsDirectory>
-                    <testFailureIgnore>false</testFailureIgnore>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 </project>

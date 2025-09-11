@@ -1,0 +1,8 @@
+# Ignore Maven target folder
+/target/
+
+# Ignore IntelliJ / Eclipse configs
+.idea/
+.classpath
+.project
+.settings/
