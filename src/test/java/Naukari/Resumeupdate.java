@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
@@ -12,9 +14,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -26,18 +28,15 @@ public class Resumeupdate {
     @Test
     public void naukarilogin() throws InterruptedException, IOException {
         
-        // Setup ChromeDriver with headless mode
+        // Setup ChromeDriver in headless mode for Jenkins
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new");   // Headless for Jenkins
         options.addArguments("--disable-gpu");
         options.addArguments("--window-size=1920,1080");
         options.addArguments("--remote-allow-origins=*");
-        options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                           + "AppleWebKit/537.36 (KHTML, like Gecko) "
-                           + "Chrome/117.0.0.0 Safari/537.36");  // Force desktop
-        
         driver = new ChromeDriver(options);
+
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
         
         // Open Naukri
@@ -68,13 +67,10 @@ public class Resumeupdate {
             By.xpath("//a[@class='nI-gNb-info__sub-link']")));
         viewandprofileupdate.click();
         
-        // Hover and upload resume
-        WebElement updateresume = wait.until(ExpectedConditions.presenceOfElementLocated(
-            By.xpath("//input[@value='Update resume']")));
-        new Actions(driver).moveToElement(updateresume).perform();
+        // Upload resume (path from Jenkins property OR fallback to local path)
+        String filePath = System.getProperty("resume.path",
+                System.getProperty("user.dir") + "/src/test/resources/Resume/Prabhudeva_Resume.pdf");
         
-        // Relative path (resume inside project resources)
-        String filePath = System.getProperty("user.dir") + "/src/test/resources/Resume/Prabhudeva_Resume.pdf";
         System.out.println("Uploading resume from: " + filePath);
         
         WebElement fileInput = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("attachCV")));
@@ -82,22 +78,42 @@ public class Resumeupdate {
         
         System.out.println("✅ File uploaded successfully");
         
+        // Wait after upload
+        Thread.sleep(5000);
+
         // Refresh page to load updated text
         driver.navigate().refresh();
         
-        // Check for "Updated on" text with flexible locator
+        // Expected today date
+        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d, yyyy"));
+        
+        // Check for "Uploaded on" text
         try {
             WebDriverWait wait2 = new WebDriverWait(driver, Duration.ofSeconds(40));
-            By updatedText = By.xpath("//*[contains(text(),'Updated on') or contains(@class,'updateOn')]");
+            By updatedText = By.xpath("//*[contains(text(),'Uploaded on') or contains(@class,'updateOn')]");
             WebElement updated = wait2.until(ExpectedConditions.visibilityOfElementLocated(updatedText));
-            System.out.println("Resume update time: " + updated.getText());
+            
+            String resumeText = updated.getText();
+            System.out.println("Resume update time: " + resumeText);
+            
+            // Validate today's date
+            if (resumeText.contains(today)) {
+                System.out.println("✅ Resume updated successfully with today's date: " + today);
+            } else {
+                System.out.println("⚠️ Uploaded, but showing different date: " + resumeText);
+                takeScreenshot("resume_date_mismatch.png");
+            }
         } catch (Exception e) {
-            // Take screenshot if not found
-            File screenshot = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
-            Files.copy(screenshot.toPath(), new File("resume_upload_failed.png").toPath());
-            System.out.println("⚠️ Could not verify 'Updated on' text. Screenshot saved as resume_upload_failed.png");
+            takeScreenshot("resume_upload_failed.png");
+            Assert.fail("⚠️ Could not verify 'Uploaded on' text. Screenshot saved.");
         }
         
         driver.quit();
+    }
+    
+    private void takeScreenshot(String fileName) throws IOException {
+        File screenshot = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
+        Files.copy(screenshot.toPath(), new File(fileName).toPath());
+        System.out.println("📸 Screenshot saved as " + fileName);
     }
 }

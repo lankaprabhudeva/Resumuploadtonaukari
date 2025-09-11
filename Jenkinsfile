@@ -6,6 +6,11 @@ pipeline {
         jdk 'JDK17'
     }
 
+    triggers {
+        // Run once every weekday (Mon-Fri) at 6 AM
+        cron('0 6 * * 1-5')
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
@@ -19,26 +24,30 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
+        stage('Run Resume Upload Test') {
             steps {
-                bat 'mvn test'
+                // Pass resume path dynamically
+                bat 'mvn test -Dresume.path=%WORKSPACE%\\src\\test\\resources\\Resume\\Prabhudeva_Resume.pdf'
             }
         }
 
-        stage('Archive Reports') {
+        stage('Archive Reports & Screenshots') {
             steps {
-                // Archive TestNG reports
-                junit '**/test-output/junitreports/*.xml'
+                // Archive TestNG report
+                junit '**/test-output/testng-results.xml'
+
+                // Archive screenshots if any failure occurs
+                archiveArtifacts artifacts: '**/*.png', allowEmptyArchive: true
             }
         }
     }
 
     post {
         success {
-            echo 'Build Successful'
+            echo '✅ Resume Upload Job Successful'
         }
         failure {
-            echo 'Build Failed'
+            echo '❌ Resume Upload Job Failed'
         }
     }
 }
