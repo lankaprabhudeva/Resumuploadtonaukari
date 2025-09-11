@@ -7,9 +7,8 @@ pipeline {
     }
 
     triggers {
-        // Run once every weekday (Mon-Fri) at 6 AM
-        cron('0 6 * * 1-5')
-    }
+    cron('H/10 6-18 * * 1-5')
+}
 
     stages {
         stage('Checkout Code') {
