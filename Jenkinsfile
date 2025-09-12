@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven_3.9.9'   // must match name you configured in Jenkins -> Global Tool Configuration
-        jdk 'JDK_17'          // must match name you configured in Jenkins -> Global Tool Configuration
+        maven 'Maven_3.9.9'   // must match Jenkins Global Tool Configuration
+        jdk 'JDK_17'          // must match Jenkins Global Tool Configuration
     }
 
     triggers {
@@ -20,14 +20,14 @@ pipeline {
 
         stage('Build Project') {
             steps {
-                bat 'mvn clean install'
+                sh 'mvn clean install'
             }
         }
 
         stage('Run Resume Upload Test') {
             steps {
                 // Use Jenkins WORKSPACE env var
-                bat "mvn test -Dresume.path=%WORKSPACE%\\src\\test\\resources\\Resume\\Prabhudeva_Resume.pdf"
+                sh "mvn test -Dresume.path=$WORKSPACE/src/test/resources/Resume/Prabhudeva_Resume.pdf"
             }
         }
 
