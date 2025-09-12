@@ -20,24 +20,19 @@ pipeline {
 
         stage('Build Project') {
             steps {
-                // Linux shell command instead of bat
-                sh 'mvn clean install'
+                bat 'mvn clean install'
             }
         }
 
         stage('Run Resume Upload Test') {
             steps {
-                // Pass resume path dynamically using Linux style
-                sh 'mvn test -Dresume.path=$WORKSPACE/src/test/resources/Resume/Prabhudeva_Resume.pdf'
+                bat "mvn test -Dresume.path=%WORKSPACE%\\src\\test\\resources\\Resume\\Prabhudeva_Resume.pdf"
             }
         }
 
         stage('Archive Reports & Screenshots') {
             steps {
-                // Archive TestNG JUnit reports
                 junit 'target/surefire-reports/*.xml'
-
-                // Archive screenshots if any failure occurs
                 archiveArtifacts artifacts: '**/*.png', allowEmptyArchive: true
             }
         }
