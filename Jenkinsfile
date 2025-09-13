@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'ec2-agent' } // Replace with your EC2 node label
 
     tools {
         maven 'Maven_3.9.9'   // must match Jenkins Global Tool Configuration
@@ -38,7 +38,6 @@ pipeline {
             }
         }
     }
-
     post {
         success {
             echo '✅ Resume Upload Job Successful'
