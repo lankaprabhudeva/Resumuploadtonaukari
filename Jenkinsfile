@@ -1,8 +1,8 @@
 pipeline {
-    agent { label 'ec2-agent' } // Replace with your EC2 node label
+    agent any// Replace with your EC2 node label
 
     tools {
-        maven 'Maven_3.9.9'   // must match Jenkins Global Tool Configuration
+        maven 'Maven_3.9.11'   // must match Jenkins Global Tool Configuration
         jdk 'JDK_17'          // must match Jenkins Global Tool Configuration
     }
 
