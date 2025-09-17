@@ -1,13 +1,12 @@
 pipeline {
-    agent any   // run on any available Jenkins agent
+    agent any
 
     tools {
-        maven 'Maven_3.9.11'   // must match Jenkins Global Tool Configuration
-        jdk 'JDK_17'           // must match Jenkins Global Tool Configuration
+        maven 'Maven_3.9.11'
+        jdk 'JDK_17'
     }
 
     triggers {
-        // Run every 10 min between 6 AM - 6 PM, Mon-Fri
         cron('H/10 6-18 * * 1-5')
     }
 
@@ -18,9 +17,15 @@ pipeline {
             }
         }
 
+        stage('Clean Workspace') {
+            steps {
+                deleteDir()
+            }
+        }
+
         stage('Build & Test Project') {
             steps {
-                // This will build AND run your TestNG tests
+                sh "ls -l $WORKSPACE/src/test/resources/Resume/"
                 sh "mvn clean install -Dresume.path=$WORKSPACE/src/test/resources/Resume/Prabhudeva_Resume.pdf"
             }
         }

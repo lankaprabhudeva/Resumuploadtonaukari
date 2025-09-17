@@ -33,24 +33,22 @@ public class Resumeupdate {
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
 
-        // Stealth options
-        options.addArguments("--disable-blink-features=AutomationControlled");
-        options.addArguments("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                + "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.5993.90 Safari/537.36");
-
-        // Headless for Jenkins (comment this line for local debugging)
+        // Headless for Jenkins
         options.addArguments("--headless=new");
         options.addArguments("--disable-gpu");
         options.addArguments("--window-size=1920,1080");
         options.addArguments("--remote-allow-origins=*");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-blink-features=AutomationControlled");
+        options.addArguments("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                + "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.5993.90 Safari/537.36");
 
         driver = new ChromeDriver(options);
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
         // Open Naukri
         driver.get("https://www.naukri.com/");
-
-        // Debug page info
         System.out.println("Page title: " + driver.getTitle());
 
         // Click Login
@@ -97,20 +95,13 @@ public class Resumeupdate {
 
         System.out.println("✅ File uploaded successfully");
 
-        // Wait after upload
         Thread.sleep(5000);
 
-        // Refresh page to load updated text
+        // Refresh page
         driver.navigate().refresh();
 
-        // Expected today date & time
+        // Verify uploaded date
         String todayDate = LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d, yyyy"));
-        String expectedTimestamp = LocalDateTime.now()
-                .format(DateTimeFormatter.ofPattern("MMM d, yyyy 'at' h:mm a"));
-
-        System.out.println("Expected resume timestamp: " + expectedTimestamp);
-
-        // Verify updated text
         try {
             WebDriverWait wait2 = new WebDriverWait(driver, Duration.ofSeconds(40));
             By updatedText = By.xpath("//*[contains(text(),'Uploaded on') or contains(@class,'updateOn')]");
@@ -119,9 +110,8 @@ public class Resumeupdate {
             String resumeText = updated.getText();
             System.out.println("Resume update time (from site): " + resumeText);
 
-            // Validate date (time may differ by 1–2 mins, so only check date part)
             if (resumeText.contains(todayDate)) {
-                System.out.println("✅ Resume updated successfully with today's date. Full text: " + resumeText);
+                System.out.println("✅ Resume updated successfully with today's date.");
             } else {
                 System.out.println("⚠️ Uploaded, but showing different timestamp: " + resumeText);
                 takeScreenshot("resume_date_mismatch.png");
