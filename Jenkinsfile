@@ -1,9 +1,9 @@
 pipeline {
-    agent any// Replace with your EC2 node label
+    agent any   // run on any available Jenkins agent
 
     tools {
         maven 'Maven_3.9.11'   // must match Jenkins Global Tool Configuration
-        jdk 'JDK_17'          // must match Jenkins Global Tool Configuration
+        jdk 'JDK_17'           // must match Jenkins Global Tool Configuration
     }
 
     triggers {
@@ -18,16 +18,10 @@ pipeline {
             }
         }
 
-        stage('Build Project') {
+        stage('Build & Test Project') {
             steps {
-                sh 'mvn clean install'
-            }
-        }
-
-        stage('Run Resume Upload Test') {
-            steps {
-                // Use Jenkins WORKSPACE env var
-                sh "mvn test -Dresume.path=$WORKSPACE/src/test/resources/Resume/Prabhudeva_Resume.pdf"
+                // This will build AND run your TestNG tests
+                sh "mvn clean install -Dresume.path=$WORKSPACE/src/test/resources/Resume/Prabhudeva_Resume.pdf"
             }
         }
 
@@ -38,6 +32,7 @@ pipeline {
             }
         }
     }
+
     post {
         success {
             echo '✅ Resume Upload Job Successful'
