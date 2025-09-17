@@ -11,21 +11,38 @@ pipeline {
     }
 
     stages {
+        stage('Clean Workspace') {
+            steps {
+                // Clean old workspace before checkout
+                deleteDir()
+            }
+        }
+
         stage('Checkout Code') {
             steps {
                 git url: 'https://github.com/lankaprabhudeva/Resumuploadtonaukari.git', branch: 'main'
             }
         }
 
-        stage('Clean Workspace') {
+        stage('Verify Resume') {
             steps {
-                deleteDir()
+                script {
+                    def resumePath = "$WORKSPACE/src/test/resources/Resume/Prabhudeva_Resume.pdf"
+                    if (!fileExists(resumePath)) {
+                        error "❌ Resume file not found at ${resumePath}. Build failed!"
+                    } else {
+                        echo "✅ Resume file found: ${resumePath}"
+                    }
+                }
             }
         }
 
         stage('Build & Test Project') {
             steps {
+                // List the Resume folder to confirm the PDF is present
                 sh "ls -l $WORKSPACE/src/test/resources/Resume/"
+
+                // Run Maven build with the resume path
                 sh "mvn clean install -Dresume.path=$WORKSPACE/src/test/resources/Resume/Prabhudeva_Resume.pdf"
             }
         }

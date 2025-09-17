@@ -2,12 +2,12 @@
 <testng-results ignored="0" total="1" passed="1" failed="0" skipped="0">
   <reporter-output>
   </reporter-output>
-  <suite started-at="2025-09-11T11:01:00 IST" name="Default suite" finished-at="2025-09-11T11:01:21 IST" duration-ms="21166">
+  <suite started-at="2025-09-17T15:28:42 IST" name="Default suite" finished-at="2025-09-17T15:29:07 IST" duration-ms="24941">
     <groups>
     </groups>
-    <test started-at="2025-09-11T11:01:00 IST" name="Default test" finished-at="2025-09-11T11:01:21 IST" duration-ms="21166">
+    <test started-at="2025-09-17T15:28:42 IST" name="Default test" finished-at="2025-09-17T15:29:07 IST" duration-ms="24941">
       <class name="Naukari.Resumeupdate">
-        <test-method signature="naukarilogin()[pri:0, instance:Naukari.Resumeupdate@54d9d12d]" started-at="2025-09-11T11:01:00 IST" name="naukarilogin" finished-at="2025-09-11T11:01:21 IST" duration-ms="21047" status="PASS">
+        <test-method signature="naukarilogin()[pri:0, instance:Naukari.Resumeupdate@557caf28]" started-at="2025-09-17T15:28:42 IST" name="naukarilogin" finished-at="2025-09-17T15:29:07 IST" duration-ms="24808" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- naukarilogin -->
